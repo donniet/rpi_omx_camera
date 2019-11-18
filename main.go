@@ -1,34 +1,32 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
-	"os/signal"
-	"runtime/debug"
 
 	"github.com/donniet/ilclient"
 )
 
 func main() {
-	sig := make(chan os.Signal)
-	signal.Notify(sig, os.Interrupt)
+	// sig := make(chan os.Signal)
+	// signal.Notify(sig, os.Interrupt)
 
-	defer func() {
-		if r := recover(); r != nil {
-			debug.PrintStack()
-			os.Exit(1)
-		}
-	}()
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		debug.PrintStack()
+	// 		os.Exit(1)
+	// 	}
+	// }()
 
-	go func() {
-		<-sig
+	// go func() {
+	// 	<-sig
 
-		debug.PrintStack()
-		panic(fmt.Errorf("interrupted"))
-	}()
+	// 	debug.PrintStack()
+	// 	panic(fmt.Errorf("interrupted"))
+	// }()
 
-	client := ilclient.New()
+	client := ilclient.Get()
+
+	log.Printf("creating component")
 
 	cam, err := client.NewComponent("image_encode",
 		ilclient.CreateFlagDisableAllPorts,
