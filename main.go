@@ -25,6 +25,9 @@ func main() {
 		log.Printf("error getting state: %v", err)
 		return
 	}
+
+	// err = cam.Port(ilclient.CameraCaptureOut).Enable()
+
 	f, err := cam.Port(ilclient.CameraCaptureOut).GetVideoPortFormat()
 
 	log.Printf("format error: %v", err)
