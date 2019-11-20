@@ -7,28 +7,12 @@ import (
 )
 
 func main() {
-	// sig := make(chan os.Signal)
-	// signal.Notify(sig, os.Interrupt)
-
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		debug.PrintStack()
-	// 		os.Exit(1)
-	// 	}
-	// }()
-
-	// go func() {
-	// 	<-sig
-
-	// 	debug.PrintStack()
-	// 	panic(fmt.Errorf("interrupted"))
-	// }()
-
 	client := ilclient.Get()
+	defer client.Close()
 
 	log.Printf("creating component")
 
-	cam, err := client.NewComponent("image_encode",
+	cam, err := client.NewComponent("camera",
 		ilclient.CreateFlagDisableAllPorts,
 		ilclient.CreateFlagEnableOutputBuffers,
 		ilclient.CreateFlagEnableInputBuffers)
@@ -41,6 +25,11 @@ func main() {
 		log.Printf("error getting state: %v", err)
 		return
 	}
+	f, err := cam.Port(ilclient.CameraStillCaptureOut).GetImagePortFormat()
+
+	log.Printf("format error: %v", err)
+	log.Printf("formats: %v", f)
+
 	log.Printf("camera state: %v", state)
 
 	cam.SetState(ilclient.StateIdle)
