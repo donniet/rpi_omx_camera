@@ -92,7 +92,7 @@ func createEncoder(client *ilclient.Client, width uint, height uint, framerate f
 		pd.Video.Stride = ilclient.CalculateStride(pd.Video.Width, pd.BufferAlignment)
 		pd.Video.Bitrate = bitrate
 
-		err = camCapture.SetPortDefinition(pd)
+		err = encOut.SetPortDefinition(pd)
 		if err != nil {
 			log.Fatalf("error: setting port definition: %v", err)
 		}
