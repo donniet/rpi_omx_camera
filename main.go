@@ -121,4 +121,5 @@ func main() {
 
 	log.Printf("cam: %v", cam)
 	log.Printf("enc: %v", enc)
+	log.Printf("tun: %v", tun)
 }
