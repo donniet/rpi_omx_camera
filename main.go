@@ -38,6 +38,16 @@ func main() {
 		log.Fatalf("error: getting port definition: %v", err)
 	} else {
 		log.Printf("direction: %v, domain: %v, video: %v", pd.Direction, pd.Domain, pd.Video)
+		pd.Video.Width = 1440
+		pd.Video.Height = 1080
+		pd.Video.Framerate = 15.
+		pd.Video.Stride = (Width + pd.BufferAlignment - 1) &^ (pd.BufferAlignment - 1)
+		pd.Video.Color = ilclient.ColorFormatYUV420PackedPlanar
+
+		err = cam.Port(ilclient.CameraCaptureOut).SetPortDefinition(pd)
+		if err != nil {
+			log.Fatalf("error: setting port definition: %v", err)
+		}
 	}
 
 	f, err := cam.Port(ilclient.CameraCaptureOut).GetVideoPortFormat()
