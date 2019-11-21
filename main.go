@@ -41,7 +41,7 @@ func main() {
 		pd.Video.Width = 1440
 		pd.Video.Height = 1080
 		pd.Video.Framerate = 15.
-		pd.Video.Stride = (Width + pd.BufferAlignment - 1) &^ (pd.BufferAlignment - 1)
+		pd.Video.Stride = (pd.Video.Width + pd.BufferAlignment - 1) &^ (pd.BufferAlignment - 1)
 		pd.Video.Color = ilclient.ColorFormatYUV420PackedPlanar
 
 		err = cam.Port(ilclient.CameraCaptureOut).SetPortDefinition(pd)
