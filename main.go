@@ -6,19 +6,7 @@ import (
 	"github.com/donniet/ilclient"
 )
 
-/*
-int calc_stride(unsigned int width, unsigned int alignment) {
-	 return (width + alignment - 1) & (~(alignment - 1));
-}
-*/
-import "C"
-
-func main() {
-	client := ilclient.Get()
-	defer client.Close()
-
-	log.Printf("creating component")
-
+func createCamera(client *ilclient.Client, width uint, height uint, framerate float64) *ilclient.Component {
 	cam, err := client.NewComponent("camera",
 		ilclient.CreateFlagDisableAllPorts,
 		ilclient.CreateFlagEnableOutputBuffers,
@@ -41,45 +29,49 @@ func main() {
 		log.Fatalf("error: setting device number: %v", e)
 	}
 
-	if pd, err := cam.Port(ilclient.CameraCaptureOut).GetPortDefinition(); err != nil {
+	camCapture = cam.Port(ilclient.CameraCaptureOut)
+
+	if pd, err := camCapture.GetPortDefinition(); err != nil {
 		log.Fatalf("error: getting port definition: %v", err)
 	} else {
 		log.Printf("direction: %v, domain: %v, video: %v", pd.Direction, pd.Domain, pd.Video)
-		pd.Video.Width = 1440
-		pd.Video.Height = 1080
-		pd.Video.Framerate = 15.
-		pd.Video.Stride = int(C.calc_stride(C.uint(pd.Video.Width), C.uint(pd.BufferAlignment)))
+		pd.Video.Width = width
+		pd.Video.Height = height
+		pd.Video.Framerate = framerate
+		pd.Video.Stride = ilclient.CalculateStride(pd.Video.Width, pd.BufferAlignment)
 		pd.Video.Color = ilclient.ColorFormatYUV420PackedPlanar
 
-		err = cam.Port(ilclient.CameraCaptureOut).SetPortDefinition(pd)
+		err = camCapture.SetPortDefinition(pd)
 		if err != nil {
 			log.Fatalf("error: setting port definition: %v", err)
 		}
 	}
 
 	//check port def
-	if pd, err := cam.Port(ilclient.CameraCaptureOut).GetPortDefinition(); err != nil {
+	if pd, err := camCapture.GetPortDefinition(); err != nil {
 		log.Fatalf("error: getting port definition: %v", err)
 	} else {
 		log.Printf("direction: %v, domain: %v, video: %v", pd.Direction, pd.Domain, pd.Video)
+
 	}
 
-	f, err := cam.Port(ilclient.CameraCaptureOut).GetVideoPortFormat()
+	f, err := camCapture.GetVideoPortFormat()
 
 	log.Printf("format error: %v", err)
 	log.Printf("formats: %v", f)
+
+	if err := camCapture.SetFramerate(framerate); err != nil {
+		log.Fatalf("error: setting framerate: %v", err)
+	}
 
 	log.Printf("camera state: %v", state)
 
 	cam.SetState(ilclient.StateIdle)
 
-	state, err = cam.State()
-	if err != nil {
-		log.Printf("error getting state: %v", err)
-		return
-	}
-	log.Printf("camera state: %v", state)
+	return cam
+}
 
+func createEncoder(client *ilclient.Client, width uint, height uint, framerate float64, bitrate uint) *ilclient.Component {
 	enc, err := client.NewComponent("video_encode",
 		ilclient.CreateFlagEnableInputBuffers,
 		ilclient.CreateFlagEnableOutputBuffers,
@@ -87,6 +79,39 @@ func main() {
 	if err != nil {
 		log.Printf("error: %v", err)
 	}
+
+	encOut := enc.Port(ilclient.VideoEncodeCompressedOut)
+
+	if pd, err := encOut.GetPortDefinition(); err != nil {
+		log.Fatalf("error: getting port definition: %v", err)
+	} else {
+		log.Printf("encoder direction: %v, domain: %v, video: %v", pd.Direction, pd.Domain, pd.Video)
+		pd.Video.Width = width
+		pd.Video.Height = height
+		pd.Video.Framerate = framerate
+		pd.Video.Stride = ilclient.CalculateStride(pd.Video.Width, pd.BufferAlignment)
+		pd.Video.Bitrate = bitrate
+
+		err = camCapture.SetPortDefinition(pd)
+		if err != nil {
+			log.Fatalf("error: setting port definition: %v", err)
+		}
+	}
+
+	if pd, err := encOut.GetPortDefinition(); err != nil {
+		log.Fatalf("error: getting port definition: %v", err)
+	} else {
+		log.Printf("encoder direction: %v, domain: %v, video: %v", pd.Direction, pd.Domain, pd.Video)
+	}
+
+}
+
+func main() {
+	client := ilclient.Get()
+	defer client.Close()
+
+	cam := createCamera(client, 1440, 1080, 15.)
+	enc := createEncoder(client, 1440, 1080, 15., 17000000)
 
 	log.Printf("cam: %v", cam)
 	log.Printf("enc: %v", enc)
