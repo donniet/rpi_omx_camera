@@ -104,6 +104,7 @@ func createEncoder(client *ilclient.Client, width uint, height uint, framerate f
 		log.Printf("encoder direction: %v, domain: %v, video: %v", pd.Direction, pd.Domain, pd.Video)
 	}
 
+	return enc
 }
 
 func main() {
