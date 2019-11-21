@@ -27,6 +27,12 @@ func main() {
 	}
 
 	// err = cam.Port(ilclient.CameraCaptureOut).Enable()
+	if e := cam.RequestCallback(ilclient.IndexParamCameraDeviceNumber, true); e != nil {
+		log.Fatalf("error: requesting callback: %v", e)
+	}
+	if e := cam.SetCameraDeviceNumber(0); e != nil {
+		log.Fatalf("error: setting device number: %v", e)
+	}
 
 	f, err := cam.Port(ilclient.CameraCaptureOut).GetVideoPortFormat()
 
