@@ -114,6 +114,8 @@ func main() {
 	cam := createCamera(client, 1440, 1080, 15.)
 	enc := createEncoder(client, 1440, 1080, 15., 17000000)
 
+	tun := client.CreateTunnel(cam, ilclient.CameraCaptureOut, enc, ilclient.VideoEncodeCompressedOut)
+
 	log.Printf("cam: %v", cam)
 	log.Printf("enc: %v", enc)
 }
