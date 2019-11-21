@@ -66,7 +66,7 @@ func createCamera(client *ilclient.Client, width uint, height uint, framerate fl
 
 	log.Printf("camera state: %v", state)
 
-	cam.SetState(ilclient.StateIdle)
+	// cam.SetState(ilclient.StateIdle)
 
 	return cam
 }
@@ -104,19 +104,21 @@ func createEncoder(client *ilclient.Client, width uint, height uint, framerate f
 		log.Printf("encoder direction: %v, domain: %v, video: %v", pd.Direction, pd.Domain, pd.Video)
 	}
 
-	cam.SetState(ilclient.StateIdle)
+	// cam.SetState(ilclient.StateIdle)
 
 	return enc
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	client := ilclient.Get()
 	defer client.Close()
 
 	cam := createCamera(client, 1440, 1080, 15.)
 	enc := createEncoder(client, 1440, 1080, 15., 17000000)
 
-	tun, err := client.NewTunnel(cam.Port(ilclient.CameraCaptureOut), enc.Port(ilclient.VideoEncodeCompressedOut))
+	tun, err := client.NewTunnel(cam.Port(ilclient.CameraCaptureOut), enc.Port(ilclient.VideoEncodeRawVideoIn))
 	if err != nil {
 		log.Fatalf("error: create tunnel: %v", err)
 	}
