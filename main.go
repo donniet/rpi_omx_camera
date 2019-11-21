@@ -6,6 +6,13 @@ import (
 	"github.com/donniet/ilclient"
 )
 
+/*
+int calc_stride(unsigned int width, unsigned int alignment) {
+	 return (width + alignment - 1) & (~(alignment - 1));
+}
+*/
+import "C"
+
 func main() {
 	client := ilclient.Get()
 	defer client.Close()
@@ -41,7 +48,7 @@ func main() {
 		pd.Video.Width = 1440
 		pd.Video.Height = 1080
 		pd.Video.Framerate = 15.
-		pd.Video.Stride = (pd.Video.Width + pd.BufferAlignment - 1) &^ (pd.BufferAlignment - 1)
+		pd.Video.Stride = int(C.calc_stride(C.uint(pd.Video.Width), C.uint(pd.BufferAlignment)))
 		pd.Video.Color = ilclient.ColorFormatYUV420PackedPlanar
 
 		err = cam.Port(ilclient.CameraCaptureOut).SetPortDefinition(pd)
