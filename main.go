@@ -13,12 +13,12 @@ func createCamera(client *ilclient.Client, width uint, height uint, framerate fl
 		ilclient.CreateFlagEnableInputBuffers)
 	if err != nil {
 		log.Printf("error: %v", err)
-		return
+		return cam
 	}
 	state, err := cam.State()
 	if err != nil {
 		log.Printf("error getting state: %v", err)
-		return
+		return cam
 	}
 
 	// err = cam.Port(ilclient.CameraCaptureOut).Enable()
@@ -29,7 +29,7 @@ func createCamera(client *ilclient.Client, width uint, height uint, framerate fl
 		log.Fatalf("error: setting device number: %v", e)
 	}
 
-	camCapture = cam.Port(ilclient.CameraCaptureOut)
+	camCapture := cam.Port(ilclient.CameraCaptureOut)
 
 	if pd, err := camCapture.GetPortDefinition(); err != nil {
 		log.Fatalf("error: getting port definition: %v", err)
