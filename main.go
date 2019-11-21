@@ -34,6 +34,12 @@ func main() {
 		log.Fatalf("error: setting device number: %v", e)
 	}
 
+	if pd, err := cam.Port(ilclient.CameraCaptureOut).GetPortDefinition; err != nil {
+		log.Fatalf("error: getting port definition: %v", err)
+	} else {
+		log.Printf("direction: %v, domain: %v, video: %v", pd.Direction, pd.Domain, pd.Video)
+	}
+
 	f, err := cam.Port(ilclient.CameraCaptureOut).GetVideoPortFormat()
 
 	log.Printf("format error: %v", err)
