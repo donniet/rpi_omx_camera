@@ -114,7 +114,10 @@ func main() {
 	cam := createCamera(client, 1440, 1080, 15.)
 	enc := createEncoder(client, 1440, 1080, 15., 17000000)
 
-	tun := client.NewTunnel(cam.Port(ilclient.CameraCaptureOut), enc.Port(ilclient.VideoEncodeCompressedOut))
+	tun, err := client.NewTunnel(cam.Port(ilclient.CameraCaptureOut), enc.Port(ilclient.VideoEncodeCompressedOut))
+	if err != nil {
+		log.Fatalf("error: create tunnel: %v", err)
+	}
 
 	log.Printf("cam: %v", cam)
 	log.Printf("enc: %v", enc)
